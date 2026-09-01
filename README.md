@@ -157,8 +157,8 @@ docker compose up --build
 Веса модели обучены на объединённом наборе публичных датасетов.  
 **Исходные данные в репозиторий не входят** — получайте их самостоятельно по правилам каждого источника.
 
-| Датасет | Описание | Ссылка |
-|---------|----------|--------|
+| Датасет  | Ссылка |
+|---------|--------|
 | **UPENN-GBM** | [TCIA](https://www.cancerimagingarchive.net/collection/upenn-gbm/) · [DOI: 10.7937/TCIA.709X-DN49](https://doi.org/10.7937/TCIA.709X-DN49) |
 | **UCSF-PDGM** | [TCIA](https://www.cancerimagingarchive.net/collection/ucsf-pdgm/) · [DOI: 10.7937/tcia.bdgf-8v37](https://doi.org/10.7937/tcia.bdgf-8v37) |
 | **ReMIND** | [TCIA](https://www.cancerimagingarchive.net/collection/remind/) · [DOI: 10.7937/3RAG-D070](https://doi.org/10.7937/3RAG-D070) |
