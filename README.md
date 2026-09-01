@@ -152,6 +152,22 @@ docker compose up --build
 Ответ — JSON с предсказаниями, interpretability и путями к XAI-изображениям.
 
 ---
+## Данные
+
+Веса модели обучены на объединённом наборе публичных датасетов.  
+**Исходные данные в репозиторий не входят** — получайте их самостоятельно по правилам каждого источника.
+
+| Датасет | Описание | Ссылка |
+|---------|----------|--------|
+| **UPENN-GBM** | [TCIA](https://www.cancerimagingarchive.net/collection/upenn-gbm/) · [DOI: 10.7937/TCIA.709X-DN49](https://doi.org/10.7937/TCIA.709X-DN49) |
+| **UCSF-PDGM** | [TCIA](https://www.cancerimagingarchive.net/collection/ucsf-pdgm/) · [DOI: 10.7937/tcia.bdgf-8v37](https://doi.org/10.7937/tcia.bdgf-8v37) |
+| **ReMIND** | [TCIA](https://www.cancerimagingarchive.net/collection/remind/) · [DOI: 10.7937/3RAG-D070](https://doi.org/10.7937/3RAG-D070) |
+| **UCSD-PTGBM** | [TCIA](https://www.cancerimagingarchive.net/collection/ucsd-ptgbm/) · [DOI: 10.7937/fwv2-dt74](https://doi.org/10.7937/fwv2-dt74) |
+| **IXI** |  [brain-development.org](https://brain-development.org/ixi-dataset/) |
+| **OASIS-1** | [OASIS](https://sites.wustl.edu/oasisbrains/home/oasis-1/) · [DOI: 10.1162/jocn.2007.19.9.1498](https://doi.org/10.1162/jocn.2007.19.9.1498) |
+
+Перед использованием ознакомьтесь с лицензией и условиями доступа каждого датасета.
+
 ## Веса модели
 
 Скачайте обученный ансамбль из [Releases](https://github.com/<user>/<repo>/releases):
