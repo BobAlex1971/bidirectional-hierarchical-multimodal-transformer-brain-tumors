@@ -1,0 +1,31 @@
+services:
+  api:
+    build: .
+    container_name: neuroonco-ai
+    ports:
+      - "8000:8000"
+    volumes:
+      # Горячая перезагрузка кода (для разработки)
+      - ./app:/app
+      # Модели (обязательно, если они большие)
+      - ./app/models:/app/models
+      # Временные файлы (XAI + PDF)
+      - ./app/tmp:/app/tmp
+      # Сертификаты (если используете HTTPS)
+      - ./app/certs:/app/certs
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TORCH_HOME=/tmp/torch
+    # Для разработки с hot-reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+    # Раскомментируйте, если у вас есть NVIDIA GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+    restart: unless-stopped

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroOnco AI — Мультимодальный анализ ЗОГМ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .section-header {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .result-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .upload-zone {
+            transition: all 0.2s ease;
+        }
+
+        .upload-zone.dragover {
+            background-color: #f0f9ff;
+            border-color: #0ea5e9;
+        }
+
+        .prediction-bar {
+            height: 6px;
+            background: linear-gradient(90deg, #0ea5e9, #22d3ee);
+            border-radius: 9999px;
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal {
+            animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .xai-image {
+            transition: transform 0.2s ease;
+        }
+
+        .xai-image:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200">
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="px-8 py-5 flex items-center justify-between">
+                <div class="flex items-center gap-x-4">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-11 h-11 bg-gradient-to-br from-sky-400 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/30">
+                            <i class="fa-solid fa-brain text-white text-3xl"></i>
+                        </div>
+                        <div>
+                            <span class="font-display text-3xl font-semibold tracking-tighter">NeuroOnco</span>
+                            <span class="text-sky-400 font-mono text-sm align-super">AI</span>
+                        </div>
+                    </div>
+                    <div class="px-3 py-1 bg-slate-800 rounded-full text-xs font-medium flex items-center gap-x-1.5 border border-slate-700">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-emerald-400 text-xs font-semibold">v2.3 • Production</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-x-8 text-sm">
+                    <a href="#" onclick="openInfoModal('features'); return false;" class="hover:text-sky-400 transition-colors">Возможности</a>
+                    <a href="#" onclick="openInfoModal('how'); return false;" class="hover:text-sky-400 transition-colors">Как работает</a>
+                    <a href="#" onclick="openInfoModal('tech'); return false;" class="hover:text-sky-400 transition-colors">Технологии</a>
+
+                    <div class="flex items-center gap-x-2 pl-6 border-l border-slate-700">
+                        <div class="text-right">
+                            <div class="text-[10px] text-emerald-400 font-medium">2026</div>
+                        </div>
+                        <i class="fa-solid fa-hospital text-xl text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <div class="max-w-screen-2xl mx-auto px-8 pt-12 pb-8">
+        <div class="grid grid-cols-12 gap-8 items-center">
+            <div class="col-span-12 lg:col-span-7">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-slate-900 border border-slate-700 rounded-3xl mb-6">
+                        <span class="px-2.5 py-0.5 text-xs font-semibold bg-sky-500/10 text-sky-400 rounded-2xl">Новая версия</span>
+                        <span class="text-xs text-slate-400">Иерархический Multimodal Transformer + TTA Ensemble</span>
+                    </div>
+
+                    <h1 class="text-6xl lg:text-7xl font-display font-semibold tracking-tighter leading-none mb-6">
+                        Мультимодальный<br>анализ ЗОГМ<br>
+                        <span class="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">в реальном времени</span>
+                    </h1>
+
+                    <p class="text-xl text-slate-400 max-w-lg mb-8">
+                        Интеграция МРТ (T1/T1CE/T2/FLAIR) + клинико-генетических данных.<br>
+                        Точность обнаружения опухоли <span class="font-semibold text-emerald-400">99.8%</span>,
+                        C-index прогноза выживаемости <span class="font-semibold text-emerald-400">0.88</span>.
+                    </p>
+
+
+
+                    <div class="flex items-center gap-x-8 mt-8 text-xs text-slate-500">
+                        <div class="flex items-center gap-x-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i>
+                            <span>Соответствует ФЗ-152</span>
+                        </div>
+                        <div class="flex items-center gap-x-2">
+                            <i class="fa-solid fa-check text-emerald-400"></i>
+                            <span>Интегрируется с PACS/RIS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-5">
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-sky-500/10 to-cyan-500/10 rounded-[3rem] blur-3xl"></div>
+                    <div class="relative bg-slate-900 border border-slate-700 rounded-3xl p-2 shadow-2xl">
+                        <img src="https://picsum.photos/id/1015/720/520" alt="МРТ головного мозга с визуализацией опухоли"
+                             class="rounded-3xl shadow-inner w-full">
+                        <div class="absolute bottom-6 right-6 bg-slate-950/90 backdrop-blur px-4 py-2 rounded-2xl border border-slate-700 text-xs flex items-center gap-x-2">
+                            <div class="flex -space-x-1">
+                                <div class="w-3 h-3 bg-red-400 rounded-full ring-2 ring-slate-950"></div>
+                                <div class="w-3 h-3 bg-amber-400 rounded-full ring-2 ring-slate-950"></div>
+                            </div>
+                            <span class="font-mono text-[10px] text-amber-400">Grade 4 • 94.7%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div id="upload-section" class="max-w-screen-2xl mx-auto px-8 pb-16">
+        <div class="glass border border-slate-700 rounded-3xl p-8 shadow-xl">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="section-header text-black">Загрузка данных пациента</h2>
+                    <p class="text-slate-600 mt-1">Загружайте NIfTI файлы (T1, T1CE, T2, FLAIR) — можно не все 4.</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs text-slate-400">Время анализа</div>
+                    <div class="font-mono text-2xl font-semibold text-emerald-400">≤ 1-2 минуты</div>
+                </div>
+            </div>
+
+            <form id="analysis-form" onsubmit="submitAnalysis(event)">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                    <!-- Clinical Data -->
+                    <div class="lg:col-span-5">
+                        <div class="mb-4 flex items-center gap-x-3">
+                            <i class="fa-solid fa-user-md text-sky-400 text-xl"></i>
+                            <span class="font-semibold text-lg text-black">Клинические и молекулярные данные</span>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Возраст</label>
+                                    <input type="number" name="age" value="58" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Пол</label>
+                                    <select name="sex" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                        <option value="M">Мужской</option>
+                                        <option value="F">Женский</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1.5">Статус IDH1/IDH2</label>
+                                <select name="idh_status" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                    <option value="unknown">Неизвестен</option>
+                                    <option value="mutant">Мутация (благоприятный прогноз)</option>
+                                    <option value="wildtype">Wild-type</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1.5">Метилирование MGMT</label>
+                                <select name="mgmt_status" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                    <option value="unknown">Неизвестен</option>
+                                    <option value="methylated">Метилировано</option>
+                                    <option value="unmethylated">Не метилировано</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1.5">Коделеция 1p/19q</label>
+                                <select name="onep19q_status" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                    <option value="unknown">Неизвестен</option>
+                                    <option value="codeleted">Есть</option>
+                                    <option value="no">Отсутствует</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Временная точка</label>
+                                    <select name="timepoint" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                        <option value="baseline">Baseline</option>
+                                        <option value="follow-up-1">Follow-up 1</option>
+                                        <option value="follow-up-2">Follow-up 2</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-400 mb-1.5">Цензурирование</label>
+                                    <select name="censored" class="w-full bg-slate-900 border border-slate-700 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500">
+                                        <option value="0">Событие произошло</option>
+                                        <option value="1">Цензурировано</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MRI Upload -->
+                    <div class="lg:col-span-7">
+                        <div class="mb-4 flex items-center gap-x-3">
+                            <i class="fa-solid fa-images text-sky-400 text-xl"></i>
+                            <span class="font-semibold text-lg text-black">МРТ-изображения (4 последовательности)</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="upload-zone border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-3xl p-5 text-center group cursor-pointer"
+                                 onclick="document.getElementById('mri_t1').click()">
+                                <input type="file" id="mri_t1" name="mri_t1" accept=".nii,.nii.gz" class="hidden" onchange="updateFileName(this, 't1-name')">
+                                <i class="fa-solid fa-file-medical text-3xl text-slate-400 group-hover:text-sky-400 mb-3 transition-colors"></i>
+                                <div class="font-medium text-sm text-black">T1-взвешенное</div>
+                                <div id="t1-name" class="text-[10px] text-slate-500 mt-1 truncate">Не загружено</div>
+                            </div>
+
+                            <div class="upload-zone border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-3xl p-5 text-center group cursor-pointer"
+                                 onclick="document.getElementById('mri_t1ce').click()">
+                                <input type="file" id="mri_t1ce" name="mri_t1ce" accept=".nii,.nii.gz" class="hidden" onchange="updateFileName(this, 't1ce-name')">
+                                <i class="fa-solid fa-file-medical text-3xl text-slate-400 group-hover:text-sky-400 mb-3 transition-colors"></i>
+                                <div class="font-medium text-sm text-black">T1 с контрастом (T1CE)</div>
+                                <div id="t1ce-name" class="text-[10px] text-slate-500 mt-1 truncate">Не загружено</div>
+                            </div>
+
+                            <div class="upload-zone border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-3xl p-5 text-center group cursor-pointer"
+                                 onclick="document.getElementById('mri_t2').click()">
+                                <input type="file" id="mri_t2" name="mri_t2" accept=".nii,.nii.gz" class="hidden" onchange="updateFileName(this, 't2-name')">
+                                <i class="fa-solid fa-file-medical text-3xl text-slate-400 group-hover:text-sky-400 mb-3 transition-colors"></i>
+                                <div class="font-medium text-sm text-black">T2-взвешенное</div>
+                                <div id="t2-name" class="text-[10px] text-slate-500 mt-1 truncate">Не загружено</div>
+                            </div>
+
+                            <div class="upload-zone border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-3xl p-5 text-center group cursor-pointer"
+                                 onclick="document.getElementById('mri_flair').click()">
+                                <input type="file" id="mri_flair" name="mri_flair" accept=".nii,.nii.gz" class="hidden" onchange="updateFileName(this, 'flair-name')">
+                                <i class="fa-solid fa-file-medical text-3xl text-slate-400 group-hover:text-sky-400 mb-3 transition-colors"></i>
+                                <div class="font-medium text-sm text-black">FLAIR</div>
+                                <div id="flair-name" class="text-[10px] text-slate-500 mt-1 truncate">Не загружено</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-center border-t border-slate-700 pt-4">
+                            <div class="text-xs text-emerald-400 font-medium mb-2">✓ Можно загрузить не все 4 последовательности</div>
+
+                            <label class="inline-flex items-center gap-x-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-2xl text-sm cursor-pointer transition-all">
+                                <i class="fa-solid fa-file-upload"></i>
+                                <span>Загрузить готовый .pt тензор (опционально)</span>
+                                <input type="file" id="preprocessed_pt" name="preprocessed_pt" accept=".pt" class="hidden" onchange="updateFileName(this, 'pt-name')">
+                            </label>
+                            <div id="pt-name" class="text-xs text-emerald-400 mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-end items-center gap-x-4">
+                    <button type="button" onclick="clearUploads()"
+                            class="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 hover:text-white font-medium rounded-3xl flex items-center gap-x-2 transition-all text-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>Очистить загрузки</span>
+                    </button>
+                    <button type="submit"
+                            class="group px-10 py-4 bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 transition-all text-white font-semibold rounded-3xl flex items-center gap-x-3 shadow-xl shadow-sky-500/30 text-lg">
+                        <span>Запустить анализ</span>
+                        <i class="fa-solid fa-magic group-active:scale-90 transition-transform"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur z-[100] flex items-center justify-center p-4">
+        <div class="modal bg-slate-900 border border-slate-700 rounded-3xl max-w-6xl w-full max-h-[95vh] overflow-auto shadow-2xl">
+
+            <!-- Header -->
+            <div class="sticky top-0 bg-slate-900 border-b border-slate-700 px-8 py-5 flex items-center justify-between z-10">
+                <div class="flex items-center gap-x-4">
+                    <div class="px-4 py-1 bg-emerald-500/10 text-emerald-400 rounded-2xl text-sm font-semibold flex items-center gap-x-2">
+                        <i class="fa-solid fa-check-double"></i>
+                        <span>Анализ завершён</span>
+                    </div>
+                    <div>
+                        <span id="result-id" class="font-mono text-xs text-slate-400"></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-x-3">
+                    <button onclick="downloadReport()"
+                            class="px-5 py-2.5 text-sm flex items-center gap-x-2 hover:bg-slate-800 border border-slate-700 rounded-2xl transition-all">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Скачать PDF</span>
+                    </button>
+                    <button onclick="closeResults()" class="w-10 h-10 flex items-center justify-center hover:bg-slate-800 rounded-2xl transition-all">
+                        <i class="fa-solid fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                    <!-- Main Predictions -->
+                    <div class="lg:col-span-7">
+                        <h3 class="font-semibold text-xl mb-5">Результаты диагностики</h3>
+
+                        <!-- Tumor -->
+                        <div class="result-card bg-slate-800 border border-slate-700 rounded-3xl p-6 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <div class="text-sm text-slate-400">Обнаружение опухоли</div>
+                                    <div id="tumor-pred" class="text-4xl font-semibold mt-1"></div>
+                                </div>
+                                <div class="text-right">
+                                    <div id="tumor-prob" class="text-5xl font-semibold tabular-nums text-emerald-400"></div>
+                                    <div class="text-xs text-slate-400 -mt-1">вероятность</div>
+                                </div>
+                            </div>
+                            <div class="h-2.5 bg-slate-700 rounded-full overflow-hidden mb-2">
+                                <div id="tumor-bar" class="prediction-bar" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Grade -->
+                        <div id="grade-card" class="result-card bg-slate-800 border border-slate-700 rounded-3xl p-6 mb-6">
+                            <div class="flex justify-between mb-4">
+                                <div>
+                                    <div class="text-sm text-slate-400">Степень злокачественности (WHO)</div>
+                                    <div id="grade-pred" class="text-3xl font-semibold mt-1"></div>
+                                </div>
+                                <div class="text-right">
+                                    <div id="grade-conf" class="text-4xl font-semibold text-amber-400"></div>
+                                </div>
+                            </div>
+                            <div id="grade-bars" class="space-y-3 text-sm"></div>
+                        </div>
+
+                        <!-- Diagnosis -->
+                        <div id="diagnosis-card" class="result-card bg-slate-800 border border-slate-700 rounded-3xl p-6">
+                            <div class="text-sm text-slate-400 mb-3">Наиболее вероятный диагноз</div>
+                            <div id="diagnosis-pred" class="text-3xl font-semibold text-white mb-4"></div>
+                            <div id="diagnosis-bars" class="space-y-2.5"></div>
+                        </div>
+                    </div>
+
+                    <!-- Survival + XAI Text -->
+                    <div class="lg:col-span-5">
+                        <!-- Survival -->
+                        <div id="survival-card" class="result-card bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-3xl p-6 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm text-slate-400">Прогноз общей выживаемости</div>
+                                    <div class="flex items-baseline gap-x-1 mt-1">
+                                        <span id="survival-months" class="text-6xl font-semibold tabular-nums"></span>
+                                        <span class="text-2xl text-slate-400">мес.</span>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-heartbeat text-4xl text-rose-400"></i>
+                            </div>
+                            <div class="text-xs text-slate-400">
+                                C-index модели: <span id="c-index" class="font-mono text-emerald-400"></span>
+                            </div>
+                        </div>
+
+                        <!-- Interpretability -->
+                        <div class="result-card bg-slate-800 border border-slate-700 rounded-3xl p-6">
+                            <div class="font-semibold mb-4 flex items-center gap-x-2">
+                                <i class="fa-solid fa-chart-line text-sky-400"></i>
+                                <span>Интерпретируемость модели (XAI)</span>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="text-xs text-slate-400 mb-2">Вклад модальностей МРТ</div>
+                                <div id="modality-importance" class="space-y-2 text-xs"></div>
+                            </div>
+
+                            <div>
+                                <div class="text-xs text-slate-400 mb-2">Ключевые клинические признаки</div>
+                                <div id="clinical-importance" class="space-y-2 text-xs"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- XAI Visualizations -->
+                <div class="mt-8">
+                    <h3 class="font-semibold text-xl mb-4 flex items-center gap-x-2">
+                        <i class="fa-solid fa-brain text-sky-400"></i>
+                        <span>Визуализации объяснимости модели (XAI)</span>
+                    </h3>
+
+                    <div id="xai-section" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <!-- XAI images injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Warnings -->
+                <div id="warnings-section" class="mt-8 hidden">
+                    <div class="bg-amber-900/20 border border-amber-700/50 rounded-3xl p-5 text-sm">
+                        <div class="font-semibold text-amber-400 flex items-center gap-x-2 mb-2">
+                            <i class="fa-solid fa-exclamation-triangle"></i>
+                            <span>Предупреждения</span>
+                        </div>
+                        <ul id="warnings-list" class="list-disc list-inside text-amber-300 text-sm space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-700 px-8 py-4 bg-slate-950/50 text-xs text-slate-400 flex items-center justify-between rounded-b-3xl">
+                <div>Модель: BidirectionalMultimodalTransformer-v2.3 (ensemble + TTA)</div>
+                <div class="font-mono">Соответствует ФЗ-152 • Росздравнадзор</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modals: Возможности / Как работает / Технологии -->
+    <div id="info-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur z-[100] flex items-center justify-center p-4">
+        <div class="modal bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-auto shadow-2xl">
+            <div class="sticky top-0 bg-slate-900 border-b border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+                <div class="flex items-center gap-x-3">
+                    <div id="info-modal-icon" class="w-10 h-10 rounded-2xl bg-sky-500/15 flex items-center justify-center">
+                        <i class="fa-solid fa-info text-sky-400"></i>
+                    </div>
+                    <h3 id="info-modal-title" class="font-semibold text-xl text-white"></h3>
+                </div>
+                <button onclick="closeInfoModal()" class="w-10 h-10 flex items-center justify-center hover:bg-slate-800 rounded-2xl transition-all">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="info-modal-body" class="p-6 text-slate-300 text-sm leading-relaxed space-y-4">
+                <!-- Content injected by JS -->
+            </div>
+            <div class="border-t border-slate-700 px-6 py-3 bg-slate-950/50 text-xs text-slate-500 rounded-b-3xl flex justify-end">
+                <button onclick="closeInfoModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-2xl transition-all">
+                    Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateFileName(input, targetId) {
+            const target = document.getElementById(targetId);
+            if (input.files.length > 0) {
+                target.innerHTML = `<span class="text-emerald-400">${input.files[0].name}</span>`;
+            } else {
+                target.innerHTML = 'Не загружено';
+            }
+        }
+
+        function clearUploads() {
+            // Очистка файловых инпутов МРТ и .pt
+            const fileInputs = ['mri_t1', 'mri_t1ce', 'mri_t2', 'mri_flair', 'preprocessed_pt'];
+            fileInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.value = '';
+                }
+            });
+
+            // Сброс подписей
+            const nameIds = [
+                { id: 't1-name', text: 'Не загружено' },
+                { id: 't1ce-name', text: 'Не загружено' },
+                { id: 't2-name', text: 'Не загружено' },
+                { id: 'flair-name', text: 'Не загружено' },
+                { id: 'pt-name', text: '' }
+            ];
+            nameIds.forEach(({ id, text }) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = text;
+            });
+        }
+
+        async function submitAnalysis(e) {
+            e.preventDefault();
+            const form = document.getElementById('analysis-form');
+            const formData = new FormData(form);
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `<span class="flex items-center gap-x-2"><i class="fa-solid fa-spinner fa-spin"></i> Анализируем...</span>`;
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/analyze', { method: 'POST', body: formData });
+                if (!response.ok) throw new Error((await response.json()).detail || 'Ошибка сервера');
+                const result = await response.json();
+                showResults(result);
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showResults(result) {
+            const setText = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            };
+
+            setText('result-id', result.request_id);
+
+            // === Tumor ===
+            const tumorPred = document.getElementById('tumor-pred');
+            const tumorProbEl = document.getElementById('tumor-prob');
+            const tumorBar = document.getElementById('tumor-bar');
+
+            if (tumorPred) {
+                tumorPred.textContent = result.tumor.prediction;
+                tumorPred.className = result.tumor.probability > 0.5
+                    ? 'text-4xl font-semibold text-red-400'
+                    : 'text-4xl font-semibold text-emerald-400';
+            }
+            if (tumorProbEl) tumorProbEl.textContent = (result.tumor.probability * 100).toFixed(1) + '%';
+            if (tumorBar) {
+                tumorBar.style.width = (result.tumor.probability * 100) + '%';
+                tumorBar.style.background = result.tumor.probability > 0.5
+                    ? 'linear-gradient(90deg, #f87171, #ef4444)'
+                    : 'linear-gradient(90deg, #34d399, #10b981)';
+            }
+
+            // === Grade ===
+            setText('grade-pred', result.grade.prediction);
+            setText('grade-conf', (result.grade.confidence * 100).toFixed(0) + '%');
+
+            const gradeBars = document.getElementById('grade-bars');
+            if (gradeBars) {
+                gradeBars.innerHTML = '';
+                Object.entries(result.grade.probabilities).forEach(([grade, prob]) => {
+                    const isActive = grade === result.grade.prediction;
+                    const div = document.createElement('div');
+                    div.className = `flex items-center gap-x-3 ${isActive ? 'font-semibold' : ''}`;
+                    div.innerHTML = `
+                        <div class="w-24 text-xs truncate">${grade}</div>
+                        <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+                            <div class="h-2 ${isActive ? 'bg-amber-400' : 'bg-slate-500'}" style="width: ${prob * 100}%"></div>
+                        </div>
+                        <div class="w-12 text-right text-xs tabular-nums">${(prob * 100).toFixed(1)}%</div>
+                    `;
+                    gradeBars.appendChild(div);
+                });
+            }
+
+            // === Diagnosis ===
+            setText('diagnosis-pred', result.diagnosis.prediction);
+            const diagBars = document.getElementById('diagnosis-bars');
+            if (diagBars) {
+                diagBars.innerHTML = '';
+                Object.entries(result.diagnosis.probabilities).forEach(([diag, prob]) => {
+                    const isActive = diag === result.diagnosis.prediction;
+                    const div = document.createElement('div');
+                    div.className = `flex items-center gap-x-3 text-xs ${isActive ? 'font-semibold text-white' : 'text-slate-300'}`;
+                    div.innerHTML = `
+                        <div class="flex-1">${diag}</div>
+                        <div class="w-9 text-right tabular-nums">${(prob * 100).toFixed(1)}%</div>
+                    `;
+                    diagBars.appendChild(div);
+                });
+            }
+
+            // === Survival ===
+            const surv = result.survival || {};
+            const monthsEl = document.getElementById('survival-months');
+            if (monthsEl) {
+                const unitEl = monthsEl.nextElementSibling;
+                if (surv.category && surv.category.trim() !== '') {
+                    monthsEl.textContent = surv.category;
+                    monthsEl.style.fontSize = '2.1rem';
+                    if (unitEl) unitEl.style.display = 'none';
+                } else {
+                    monthsEl.textContent = surv.months || '?';
+                    monthsEl.style.fontSize = '3.5rem';
+                    if (unitEl) unitEl.style.display = '';
+                }
+            }
+            setText('c-index', surv.c_index || '—');
+
+            // === XAI Text Summary ===
+            const modImp = document.getElementById('modality-importance');
+            if (modImp) {
+                modImp.innerHTML = '';
+                Object.entries(result.interpretability?.modality_attention || {}).forEach(([mod, val]) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<div class="flex justify-between text-xs"><span>${mod}</span><span class="font-mono text-sky-400">${val}</span></div>`;
+                    modImp.appendChild(div);
+                });
+            }
+
+            const clinImp = document.getElementById('clinical-importance');
+            if (clinImp) {
+                clinImp.innerHTML = '';
+                Object.entries(result.interpretability?.clinical_shap || {}).forEach(([feat, val]) => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<div class="flex justify-between text-xs"><span>${feat}</span><span class="font-mono text-rose-400">${val}</span></div>`;
+                    clinImp.appendChild(div);
+                });
+            }
+
+            // === XAI Visualizations ===
+            const xaiContainer = document.getElementById('xai-section');
+            xaiContainer.innerHTML = '';
+
+            if (result.xai_images) {
+                const xaiImages = [
+                    { key: 'attention_shap', title: 'Attention + SHAP', icon: 'fa-chart-bar' },
+                    { key: 'gradcam', title: 'Grad-CAM по модальностям', icon: 'fa-eye' },
+                    { key: 'ig_approx', title: 'Integrated Gradients', icon: 'fa-chart-line' }
+                ];
+
+                xaiImages.forEach(imgInfo => {
+                    const path = result.xai_images[imgInfo.key];
+                    if (path) {
+                        const filename = path.split('/').pop();
+                        const url = `/xai/${filename}`;
+
+                        const card = document.createElement('div');
+                        card.className = 'bg-slate-800 border border-slate-700 rounded-3xl overflow-hidden';
+                        card.innerHTML = `
+                            <div class="px-4 py-3 bg-slate-900 flex items-center gap-x-2">
+                                <i class="fa-solid ${imgInfo.icon} text-sky-400"></i>
+                                <span class="font-medium text-sm">${imgInfo.title}</span>
+                            </div>
+                            <img src="${url}" class="w-full h-auto cursor-pointer xai-image"
+                                 onclick="window.open('${url}', '_blank')" alt="${imgInfo.title}">
+                        `;
+                        xaiContainer.appendChild(card);
+                    }
+                });
+            }
+
+            // ====================== ЛОГИКА ДЛЯ ЗДОРОВЫХ ПАЦИЕНТОВ ======================
+            const tumorProbability = result.tumor?.probability ?? 1.0;
+            const predictionText = (result.tumor?.prediction || '').toLowerCase();
+            const isHealthy = tumorProbability <= 0.3 && !predictionText.includes('злокачественная');
+
+            // Показываем все карточки по умолчанию
+            document.getElementById('grade-card').style.display = '';
+            document.getElementById('diagnosis-card').style.display = '';
+            document.getElementById('survival-card').style.display = '';
+
+            // Удаляем старое сообщение о здоровом мозге, если есть
+            const oldMsg = document.getElementById('healthy-msg');
+            if (oldMsg) oldMsg.remove();
+
+            if (isHealthy) {
+                // Скрываем ненужные блоки у здоровых
+                document.getElementById('survival-card').style.display = 'none';
+
+                // Показываем зелёное сообщение
+                const healthyMsg = document.createElement('div');
+                healthyMsg.id = 'healthy-msg';
+                healthyMsg.className = 'mt-6 p-6 bg-emerald-900/30 border border-emerald-700 rounded-3xl text-center';
+                healthyMsg.innerHTML = `
+                    <div class="text-emerald-400 text-2xl mb-2">✅ Мозг определён как здоровый</div>
+                    <div class="text-sm text-emerald-300">Низкая вероятность опухоли. Рекомендуется стандартное наблюдение.</div>
+                `;
+                const container = document.querySelector('#results-modal .p-8');
+                if (container) container.appendChild(healthyMsg);
+            }
+
+            // === Warnings ===
+            const warningsSection = document.getElementById('warnings-section');
+            const warningsList = document.getElementById('warnings-list');
+            warningsList.innerHTML = '';
+
+            if (result.warnings && result.warnings.length > 0) {
+                warningsSection.classList.remove('hidden');
+                result.warnings.forEach(w => {
+                    const li = document.createElement('li');
+                    li.textContent = w;
+                    warningsList.appendChild(li);
+                });
+            } else {
+                warningsSection.classList.add('hidden');
+            }
+
+            // Показываем модалку
+            const modal = document.getElementById('results-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeResults() {
+            const modal = document.getElementById('results-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+
+            // Очищаем сообщение о здоровом мозге при закрытии
+            const oldMsg = document.getElementById('healthy-msg');
+            if (oldMsg) oldMsg.remove();
+        }
+
+        async function downloadReport() {
+            const requestId = document.getElementById('result-id').textContent;
+            if (requestId) window.open(`/report/${requestId}`, '_blank');
+        }
+
+        async function loadExample() {
+            try {
+                const response = await fetch('/example');
+                const result = await response.json();
+                showResults(result);
+            } catch (e) {
+                alert('Не удалось загрузить пример');
+            }
+        }
+
+        function initDragDrop() {
+            document.querySelectorAll('.upload-zone').forEach(zone => {
+                zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover', 'border-sky-500'); });
+                zone.addEventListener('dragleave', () => zone.classList.remove('dragover', 'border-sky-500'));
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover', 'border-sky-500');
+                    const input = zone.querySelector('input[type="file"]');
+                    if (input && e.dataTransfer.files.length > 0) {
+                        input.files = e.dataTransfer.files;
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            });
+        }
+
+        // ========== Info modals (Возможности / Как работает / Технологии) ==========
+        const INFO_CONTENT = {
+            features: {
+                title: 'Возможности системы',
+                icon: 'fa-rocket',
+                body: `
+                    <p class="text-slate-400">NeuroOnco AI — система поддержки принятия клинических решений для анализа злокачественных опухолей головного мозга (ЗОГМ).</p>
+                    <ul class="space-y-3 mt-3">
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">Обнаружение опухоли</strong> — вероятность наличия злокачественного процесса с точностью до 99.8%</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">Степень злокачественности (WHO)</strong> — Grade 0 / 2 / 3 / 4 с оценкой уверенности</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">Дифференциальная диагностика</strong> — глиобластома, астроцитома, олигодендроглиома и другие</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">Прогноз выживаемости</strong> — категории «менее 1 года», «1–2 года», «более 2 лет» (C-index ≈ 0.88)</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">XAI-визуализации</strong> — Attention Maps, Grad-CAM по модальностям, Integrated Gradients</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">Работа с неполными данными</strong> — можно загрузить не все 4 последовательности МРТ</span>
+                        </li>
+                        <li class="flex gap-x-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 mt-0.5"></i>
+                            <span><strong class="text-white">PDF-отчёт</strong> — готовый клинический отчёт с интерпретируемостью</span>
+                        </li>
+                    </ul>
+                `
+            },
+            how: {
+                title: 'Как работает анализ',
+                icon: 'fa-cogs',
+                body: `
+                    <ol class="space-y-4 list-decimal list-inside">
+                        <li>
+                            <strong class="text-white">Загрузка данных</strong><br>
+                            <span class="text-slate-400">Загрузите NIfTI-файлы МРТ (T1, T1CE, T2, FLAIR) и укажите клинико-молекулярные параметры (возраст, пол, IDH, MGMT, 1p/19q). Можно использовать готовый .pt-тензор.</span>
+                        </li>
+                        <li>
+                            <strong class="text-white">Предобработка</strong><br>
+                            <span class="text-slate-400">Автоматическая нормализация, ресайз до 160×160×160, квантильная фильтрация и формирование маски модальностей.</span>
+                        </li>
+                        <li>
+                            <strong class="text-white">Инференс модели</strong><br>
+                            <span class="text-slate-400">Ансамбль Bidirectional Multimodal Transformer + Test-Time Augmentation (6 аугментаций). Клинические признаки интегрируются через кросс-модальное внимание.</span>
+                        </li>
+                        <li>
+                            <strong class="text-white">Результаты + XAI</strong><br>
+                            <span class="text-slate-400">Получаете вероятность опухоли, степень, диагноз, прогноз выживаемости и визуализации объяснимости (Attention, Grad-CAM, IG).</span>
+                        </li>
+                        <li>
+                            <strong class="text-white">Отчёт</strong><br>
+                            <span class="text-slate-400">Одним кликом скачивается PDF с ключевыми результатами, клиническими данными и XAI-графиками.</span>
+                        </li>
+                    </ol>
+                    <p class="mt-4 text-xs text-slate-500">Среднее время анализа: 1–2 минуты (зависит от оборудования).</p>
+                `
+            },
+            tech: {
+                title: 'Технологии',
+                icon: 'fa-microchip',
+                body: `
+                    <div class="space-y-4">
+                        <div>
+                            <div class="text-sky-400 font-semibold mb-1">Архитектура модели</div>
+                            <p class="text-slate-400">Bidirectional Hierarchical Multimodal Transformer (v2.1–2.3). Отдельные энкодеры для каждой модальности МРТ + кросс-модальный фьюжн + двунаправленное внимание с клиническими признаками. Ансамбль + TTA.</p>
+                        </div>
+                        <div>
+                            <div class="text-sky-400 font-semibold mb-1">Стек технологий</div>
+                            <ul class="text-slate-400 space-y-1">
+                                <li>• Backend: FastAPI + Uvicorn</li>
+                                <li>• Deep Learning: PyTorch, Torchvision</li>
+                                <li>• Медицинские данные: NiBabel (NIfTI)</li>
+                                <li>• XAI: Grad-CAM, Attention Weights, Integrated Gradients (approx.)</li>
+                                <li>• Отчёты: ReportLab (PDF)</li>
+                                <li>• Frontend: Tailwind CSS + Vanilla JS</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="text-sky-400 font-semibold mb-1">Входные данные</div>
+                            <p class="text-slate-400">4 МРТ-последовательности (T1 / T1CE / T2 / FLAIR) + клинические признаки (возраст, пол, IDH-статус, MGMT, коделеция 1p/19q, временная точка).</p>
+                        </div>
+                        <div>
+                            <div class="text-sky-400 font-semibold mb-1">Соответствие требованиям</div>
+                            <p class="text-slate-400">ФЗ-152 «О персональных данных», рекомендации Росздравнадзора. Данные обрабатываются локально, отчёты конфиденциальны.</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        function openInfoModal(type) {
+            const content = INFO_CONTENT[type];
+            if (!content) return;
+
+            document.getElementById('info-modal-title').textContent = content.title;
+            document.getElementById('info-modal-body').innerHTML = content.body;
+
+            const iconEl = document.getElementById('info-modal-icon');
+            iconEl.innerHTML = `<i class="fa-solid ${content.icon} text-sky-400"></i>`;
+
+            const modal = document.getElementById('info-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('info-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Закрытие по клику на фон
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('info-modal');
+            if (e.target === modal) closeInfoModal();
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeInfoModal();
+                closeResults();
+            }
+        });
+
+        window.onload = function() {
+            initDragDrop();
+            console.log('%c[NeuroOnco AI] Фронтенд готов (v2.3 с логикой здоровых пациентов + info modals).', 'color:#64748b');
+        };
+
+        window.NeuroOnco = { loadExample, closeResults, openInfoModal, closeInfoModal };
+    </script>
+</body>
+</html>
